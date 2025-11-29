@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Mini Wiki Dark</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="topbar">
+  <span id="current-page">Home</span>
+  <input id="command" placeholder='문서 이름 또는 "All" 입력 후 Enter' />
+  <button id="btn-edit" class="btn">편집</button>
+  <button id="btn-save" class="btn btn-primary hidden">저장</button>
+  <button id="btn-cancel" class="btn hidden">취소</button>
+  <button id="btn-history" class="btn">기록</button>
+  <button id="btn-theme" class="btn">☀️</button>
+</div>
+
+<div id="main">
+  <textarea id="editor" class="hidden" spellcheck="false"></textarea>
+  <div id="preview" class="fullwidth"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
