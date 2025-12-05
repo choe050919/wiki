@@ -114,7 +114,54 @@ body {
 #main {
   flex: 1;
   display: flex;
+  justify-content: center;
   min-height: 0;
+}
+
+#main-inner {
+  display: flex;
+  width: 100%;
+  max-width: 1400px;
+  height: 100%;
+}
+
+/* 사이드바 공통 */
+#sidebar-left,
+#sidebar-right {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+  border-color: var(--border);
+  overflow-y: auto;
+}
+
+#sidebar-left {
+  border-right: 1px solid var(--border);
+}
+
+#sidebar-right {
+  border-left: 1px solid var(--border);
+}
+
+.sidebar-header {
+  padding: 12px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-content {
+  padding: 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* 콘텐츠 영역 */
+#content-area {
+  flex: 1;
+  display: flex;
+  min-width: 0;
 }
 
 #editor {
@@ -129,6 +176,7 @@ body {
   color: var(--text-primary);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 14px;
+  border-right: 1px solid var(--border);
 }
 
 #preview {
@@ -139,12 +187,11 @@ body {
   overflow: auto;
   background: var(--bg-primary);
   color: var(--text-secondary);
-  border-left: 1px solid var(--border);
 }
 
-/* 콘텐츠 중앙 정렬 + 최적 읽기 폭 */
+/* 콘텐츠 최적 읽기 폭 */
 #preview .content-wrapper {
-  max-width: 65ch;
+  max-width: 800px;
   margin: 0 auto;
 }
 
@@ -221,7 +268,12 @@ body {
 
 /* 모바일 대응 */
 @media (max-width: 900px) {
-  #main {
+  #sidebar-left,
+  #sidebar-right {
+    display: none;
+  }
+
+  #content-area {
     flex-direction: column;
   }
 
@@ -231,13 +283,7 @@ body {
     height: 50%;
   }
 
-  #preview {
-    border-left: none;
-    border-top: 1px solid var(--border);
-  }
-
   #preview.fullwidth {
     height: 100%;
-    border-top: none;
   }
 }
