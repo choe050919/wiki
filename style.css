@@ -287,3 +287,123 @@ body {
     height: 100%;
   }
 }
+
+/* 목차 스타일 */
+.toc-content {
+  padding: 8px 12px;
+}
+
+.toc-empty {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 0;
+}
+
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc-item {
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.toc-link {
+  display: block;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 12px;
+  padding: 2px 0;
+  border-radius: 3px;
+  transition: background 0.15s;
+}
+
+.toc-link:hover {
+  color: var(--link);
+  background: var(--btn-bg);
+}
+
+.toc-number {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.toc-text {
+  word-break: break-word;
+}
+
+/* 목차 들여쓰기 */
+.toc-depth-0 { padding-left: 0; }
+.toc-depth-1 { padding-left: 12px; }
+.toc-depth-2 { padding-left: 24px; }
+.toc-depth-3 { padding-left: 36px; }
+.toc-depth-4 { padding-left: 48px; }
+.toc-depth-5 { padding-left: 60px; }
+
+/* 사이드바 탭 시스템 */
+.sidebar-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-tab {
+  flex: 1;
+  padding: 8px 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.sidebar-tab:hover {
+  background: var(--btn-bg);
+  color: var(--text-primary);
+}
+
+.sidebar-tab.active {
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border-bottom: 2px solid var(--btn-primary);
+  margin-bottom: -1px;
+}
+
+.sidebar-tab-content {
+  padding: 8px 12px;
+}
+
+.sidebar-empty {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 0;
+}
+
+/* 백링크 스타일 */
+.backlink-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.backlink-item {
+  margin: 4px 0;
+}
+
+.backlink-link {
+  display: block;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 3px;
+  transition: background 0.15s;
+}
+
+.backlink-link:hover {
+  color: var(--link);
+  background: var(--btn-bg);
+}

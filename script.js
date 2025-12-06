@@ -141,6 +141,7 @@ function renderPreview() {
   const text = state.pages[state.current] || "";
   previewEl.innerHTML = '<div class="content-wrapper">' + marked.parse(text) + '</div>';
   attachInternalLinkHandlers();
+  buildTOC();
 }
 
 function renderAllList() {
@@ -175,6 +176,8 @@ function renderAllList() {
       saveState();
     });
   });
+
+  buildTOC();
 }
 
 function updatePreview() {
@@ -184,6 +187,7 @@ function updatePreview() {
   const text = editorEl.value;
   previewEl.innerHTML = '<div class="content-wrapper">' + marked.parse(text) + '</div>';
   attachInternalLinkHandlers();
+  buildTOC();
 }
 
 function renderHistory(pageName) {
@@ -239,6 +243,8 @@ function renderHistory(pageName) {
     setAllMode(false);
     saveState();
   });
+
+  buildTOC();
 }
 
 function renderHistoryDetail(idx) {
@@ -274,6 +280,155 @@ function renderHistoryDetail(idx) {
     e.preventDefault();
     renderHistory(h.page);
   });
+
+  buildTOC();
+}
+
+// 우측 사이드바 탭 시스템
+let currentRightTab = "toc"; // "toc" | "backlinks"
+
+function buildSidebarRight() {
+  const sidebarRight = document.getElementById("sidebar-right");
+  if (!sidebarRight) return;
+
+  // 탭 헤더 생성
+  let html = '<div class="sidebar-tabs">';
+  html += `<button class="sidebar-tab ${currentRightTab === 'toc' ? 'active' : ''}" data-tab="toc">목차</button>`;
+  html += `<button class="sidebar-tab ${currentRightTab === 'backlinks' ? 'active' : ''}" data-tab="backlinks">백링크</button>`;
+  html += '</div>';
+
+  // 탭 내용
+  html += '<div class="sidebar-tab-content">';
+  if (currentRightTab === "toc") {
+    html += buildTOCContent();
+  } else if (currentRightTab === "backlinks") {
+    html += buildBacklinksContent();
+  }
+  html += '</div>';
+
+  sidebarRight.innerHTML = html;
+
+  // 탭 버튼 이벤트
+  sidebarRight.querySelectorAll(".sidebar-tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      currentRightTab = btn.getAttribute("data-tab");
+      buildSidebarRight();
+    });
+  });
+}
+
+function buildTOCContent() {
+  // All 모드, History 모드에서는 목차 비우기
+  if (isAllMode || isHistoryMode) {
+    return '<p class="sidebar-empty">목차 없음</p>';
+  }
+
+  // 헤딩 수집
+  const headings = previewEl.querySelectorAll("h1, h2, h3, h4, h5, h6");
+  
+  if (headings.length === 0) {
+    return '<p class="sidebar-empty">목차 없음</p>';
+  }
+
+  // 헤딩 정보 추출
+  const items = [];
+  headings.forEach((h, idx) => {
+    const level = parseInt(h.tagName.charAt(1));
+    const text = h.textContent;
+    const id = "toc-heading-" + idx;
+    h.id = id;
+    items.push({ level, text, id });
+  });
+
+  // 최소 레벨 찾기
+  const minLevel = Math.min(...items.map(i => i.level));
+
+  // 나무위키 스타일 번호 생성
+  const counters = [0, 0, 0, 0, 0, 0];
+  const tocItems = items.map(item => {
+    const depth = item.level - minLevel;
+    counters[depth]++;
+    for (let i = depth + 1; i < 6; i++) {
+      counters[i] = 0;
+    }
+    const numberParts = [];
+    for (let i = 0; i <= depth; i++) {
+      numberParts.push(counters[i]);
+    }
+    const number = numberParts.join(".");
+    return { number, text: item.text, id: item.id, depth };
+  });
+
+  let html = '<ul class="toc-list">';
+  tocItems.forEach(item => {
+    html += `<li class="toc-item toc-depth-${item.depth}">`;
+    html += `<a href="#${item.id}" class="toc-link">`;
+    html += `<span class="toc-number">${item.number}.</span> `;
+    html += `<span class="toc-text">${item.text}</span>`;
+    html += `</a></li>`;
+  });
+  html += '</ul>';
+  
+  return html;
+}
+
+function buildBacklinksContent() {
+  if (isAllMode || isHistoryMode) {
+    return '<p class="sidebar-empty">백링크 없음</p>';
+  }
+
+  const currentPage = state.current;
+  const backlinks = [];
+
+  // 모든 페이지에서 현재 페이지를 링크하는 것 찾기
+  for (const [pageName, content] of Object.entries(state.pages)) {
+    if (pageName === currentPage) continue;
+    
+    // 마크다운 링크 패턴: [텍스트](링크)
+    // 현재 페이지를 가리키는 링크 찾기
+    const linkPattern = new RegExp(`\\[([^\\]]+)\\]\\(${escapeRegExp(currentPage)}\\)`, 'g');
+    if (linkPattern.test(content)) {
+      backlinks.push(pageName);
+    }
+  }
+
+  if (backlinks.length === 0) {
+    return '<p class="sidebar-empty">이 문서를 링크한 문서가 없습니다</p>';
+  }
+
+  let html = '<ul class="backlink-list">';
+  backlinks.sort((a, b) => a.localeCompare(b, "ko")).forEach(name => {
+    html += `<li class="backlink-item">`;
+    html += `<a href="#" class="backlink-link" data-page="${encodeURIComponent(name)}">${name}</a>`;
+    html += `</li>`;
+  });
+  html += '</ul>';
+
+  // 이벤트는 buildSidebarRight에서 처리하기 어려우니 setTimeout으로
+  setTimeout(() => {
+    document.querySelectorAll(".backlink-link").forEach(a => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        const name = decodeURIComponent(a.getAttribute("data-page"));
+        state.current = name;
+        isHistoryMode = false;
+        setAllMode(false);
+        saveState();
+      });
+    });
+  }, 0);
+
+  return html;
+}
+
+// 정규식 특수문자 이스케이프
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// 기존 호환성을 위한 별칭
+function buildTOC() {
+  buildSidebarRight();
 }
 
 // 내부 링크 처리
