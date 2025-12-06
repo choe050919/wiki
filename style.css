@@ -57,11 +57,6 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-#current-page {
-  font-weight: 600;
-  font-size: 14px;
-}
-
 #command {
   flex: 1;
   padding: 4px 8px;
@@ -202,6 +197,21 @@ body {
 }
 
 /* 미리보기 기본 마크다운 스타일 */
+#preview .page-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--heading-border);
+  color: var(--text-primary);
+}
+
+#preview .history-timestamp {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: -12px 0 16px 0;
+}
+
 #preview h1 {
   font-size: 22px;
   margin: 12px 0 8px;
@@ -332,6 +342,18 @@ body {
 
 .toc-text {
   word-break: break-word;
+}
+
+/* 목차 제목 항목 (번호 없음) */
+.toc-title-item {
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.toc-title-link {
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 /* 목차 들여쓰기 */

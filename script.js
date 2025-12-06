@@ -4,7 +4,6 @@ const HISTORY_KEY = "miniWikiHistory";
 // DOM 요소
 const editorEl = document.getElementById("editor");
 const previewEl = document.getElementById("preview");
-const currentPageEl = document.getElementById("current-page");
 const commandEl = document.getElementById("command");
 const btnEdit = document.getElementById("btn-edit");
 const btnSave = document.getElementById("btn-save");
@@ -133,24 +132,25 @@ function setAllMode(on) {
 
 // 렌더링
 function renderCurrentPage() {
-  currentPageEl.textContent = state.current;
   setEditMode(false);
 }
 
 function renderPreview() {
   const text = state.pages[state.current] || "";
-  previewEl.innerHTML = '<div class="content-wrapper">' + marked.parse(text) + '</div>';
+  let html = '<div class="content-wrapper">';
+  html += '<h1 class="page-title">' + state.current + '</h1>';
+  html += marked.parse(text);
+  html += '</div>';
+  previewEl.innerHTML = html;
   attachInternalLinkHandlers();
   buildTOC();
 }
 
 function renderAllList() {
-  currentPageEl.textContent = "All Documents";
-
   const names = Object.keys(state.pages).sort((a, b) => a.localeCompare(b, "ko"));
 
   let html = '<div class="content-wrapper">';
-  html += "<h1>All Documents</h1>";
+  html += '<h1 class="page-title">All Documents</h1>';
   if (names.length === 0) {
     html += "<p>아직 문서가 없습니다.</p>";
   } else {
@@ -185,7 +185,11 @@ function updatePreview() {
     return;
   }
   const text = editorEl.value;
-  previewEl.innerHTML = '<div class="content-wrapper">' + marked.parse(text) + '</div>';
+  let html = '<div class="content-wrapper">';
+  html += '<h1 class="page-title">' + state.current + '</h1>';
+  html += marked.parse(text);
+  html += '</div>';
+  previewEl.innerHTML = html;
   attachInternalLinkHandlers();
   buildTOC();
 }
@@ -197,8 +201,6 @@ function renderHistory(pageName) {
   btnEdit.classList.add("hidden");
   btnHistory.classList.add("hidden");
 
-  currentPageEl.textContent = "History: " + pageName;
-
   // 해당 페이지 기록만 필터링하되, 원본 인덱스도 함께 저장
   const pageHistory = history
     .map((h, idx) => ({ ...h, originalIdx: idx }))
@@ -206,7 +208,7 @@ function renderHistory(pageName) {
     .reverse(); // 최신순
 
   let html = '<div class="content-wrapper">';
-  html += "<h1>" + pageName + " 수정 기록</h1>";
+  html += '<h1 class="page-title">History: ' + pageName + '</h1>';
   
   if (pageHistory.length === 0) {
     html += "<p>수정 기록이 없습니다.</p>";
@@ -251,9 +253,11 @@ function renderHistoryDetail(idx) {
   const h = history[idx];
   if (!h) return;
 
-  currentPageEl.textContent = "History: " + h.page + " (" + new Date(h.time).toLocaleString("ko-KR") + ")";
+  const timeStr = new Date(h.time).toLocaleString("ko-KR");
 
   let html = '<div class="content-wrapper">';
+  html += '<h1 class="page-title">History: ' + h.page + '</h1>';
+  html += '<p class="history-timestamp">' + timeStr + '</p>';
   html += marked.parse(h.content);
   html += "<hr style='border-color:var(--border); margin: 20px 0;'>";
   html += "<p style='font-size:13px; color:var(--text-muted);'>";
@@ -323,11 +327,26 @@ function buildTOCContent() {
     return '<p class="sidebar-empty">목차 없음</p>';
   }
 
-  // 헤딩 수집
-  const headings = previewEl.querySelectorAll("h1, h2, h3, h4, h5, h6");
+  // 페이지 제목 요소
+  const pageTitle = previewEl.querySelector(".page-title");
+  
+  // 헤딩 수집 (page-title 제외)
+  const headings = previewEl.querySelectorAll("h1:not(.page-title), h2, h3, h4, h5, h6");
+  
+  let html = '<ul class="toc-list">';
+  
+  // 제목을 맨 위에 번호 없이 추가
+  if (pageTitle) {
+    pageTitle.id = "toc-page-title";
+    html += `<li class="toc-item toc-title-item">`;
+    html += `<a href="#toc-page-title" class="toc-link toc-title-link">`;
+    html += `<span class="toc-text">${state.current}</span>`;
+    html += `</a></li>`;
+  }
   
   if (headings.length === 0) {
-    return '<p class="sidebar-empty">목차 없음</p>';
+    html += '</ul>';
+    return html;
   }
 
   // 헤딩 정보 추출
@@ -359,7 +378,6 @@ function buildTOCContent() {
     return { number, text: item.text, id: item.id, depth };
   });
 
-  let html = '<ul class="toc-list">';
   tocItems.forEach(item => {
     html += `<li class="toc-item toc-depth-${item.depth}">`;
     html += `<a href="#${item.id}" class="toc-link">`;
