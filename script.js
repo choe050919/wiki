@@ -490,6 +490,72 @@ function attachInternalLinkHandlers() {
 
 const btnTheme = document.getElementById("btn-theme");
 const btnHistory = document.getElementById("btn-history");
+const btnExport = document.getElementById("btn-export");
+const btnImport = document.getElementById("btn-import");
+const importFileEl = document.getElementById("import-file");
+
+// 내보내기 함수
+function exportData() {
+  const data = {
+    pages: state.pages,
+    history: history,
+    exportedAt: new Date().toISOString()
+  };
+  
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "mini-wiki-backup-" + new Date().toISOString().slice(0, 10) + ".json";
+  a.click();
+  
+  URL.revokeObjectURL(url);
+}
+
+// 가져오기 함수
+function importData(file) {
+  const reader = new FileReader();
+  
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      
+      if (!data.pages || typeof data.pages !== "object") {
+        alert("올바른 백업 파일이 아닙니다.");
+        return;
+      }
+      
+      if (!confirm("기존 데이터를 모두 덮어씁니다. 계속하시겠습니까?")) {
+        return;
+      }
+      
+      // 데이터 교체
+      state.pages = data.pages;
+      state.current = Object.keys(data.pages)[0] || "Home";
+      
+      if (Array.isArray(data.history)) {
+        history = data.history;
+      } else {
+        history = [];
+      }
+      
+      saveState();
+      saveHistory();
+      
+      // 화면 갱신
+      isHistoryMode = false;
+      setAllMode(false);
+      
+      alert("가져오기 완료!");
+    } catch (err) {
+      alert("파일을 읽는 중 오류가 발생했습니다: " + err.message);
+    }
+  };
+  
+  reader.readAsText(file);
+}
 
 // 이벤트 리스너
 btnEdit.addEventListener("click", () => {
@@ -520,6 +586,20 @@ btnTheme.addEventListener("click", () => {
   const isLight = document.documentElement.classList.toggle("light");
   btnTheme.textContent = isLight ? "🌙" : "☀️";
   localStorage.setItem("wikiTheme", isLight ? "light" : "dark");
+});
+
+btnExport.addEventListener("click", exportData);
+
+btnImport.addEventListener("click", () => {
+  importFileEl.click();
+});
+
+importFileEl.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    importData(file);
+    importFileEl.value = ""; // 같은 파일 다시 선택 가능하도록
+  }
 });
 
 commandEl.addEventListener("keydown", (e) => {
