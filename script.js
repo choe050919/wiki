@@ -641,6 +641,49 @@ commandEl.addEventListener("keydown", (e) => {
 
 editorEl.addEventListener("input", updatePreview);
 
+// 단축키
+document.addEventListener("keydown", (e) => {
+  // Ctrl+E: 편집 모드 진입
+  if (e.ctrlKey && e.key === "e") {
+    e.preventDefault();
+    if (!isAllMode && !isHistoryMode && !isEditMode) {
+      setEditMode(true);
+    }
+  }
+  
+  // Ctrl+S: 저장
+  if (e.ctrlKey && e.key === "s") {
+    e.preventDefault();
+    if (isEditMode) {
+      const newContent = editorEl.value;
+      addHistory(state.current, newContent);
+      state.pages[state.current] = newContent;
+      saveState();
+      setEditMode(false);
+    }
+  }
+  
+  // Esc: 편집 취소 / 모드 나가기
+  if (e.key === "Escape") {
+    if (isEditMode) {
+      setEditMode(false);
+    } else if (isHistoryMode) {
+      isHistoryMode = false;
+      setAllMode(false);
+    } else if (isAllMode) {
+      setAllMode(false);
+    }
+  }
+  
+  // Ctrl+H: 히스토리 보기
+  if (e.ctrlKey && e.key === "h") {
+    e.preventDefault();
+    if (!isAllMode && !isHistoryMode) {
+      renderHistory(state.current);
+    }
+  }
+});
+
 // 초기화
 loadState();
 loadHistory();
