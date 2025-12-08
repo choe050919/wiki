@@ -1,6 +1,6 @@
 /* CSS 변수 - 다크 모드 (기본) */
 :root {
-  --bg-primary: #222222;
+  --bg-primary: #1e1e1e;
   --bg-secondary: #252526;
   --bg-topbar: #111827;
   --border: #374151;
