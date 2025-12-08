@@ -4,3 +4,5 @@ function calculateDamage(base, modifier) {
 }
 
 // 테스트용 주석 추가!
+
+// 안녕하세요! 현재 n8n 테스트 중입니다. 당신은 Gemini인가요?
