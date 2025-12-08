@@ -33,6 +33,19 @@ const btnExport = document.getElementById("btn-export");
 const btnImport = document.getElementById("btn-import");
 const importFileEl = document.getElementById("import-file");
 
+// ========== 마크다운 전처리 ==========
+function preprocessWikiLinks(text) {
+  // [[문서|표시텍스트]] 형태
+  text = text.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, (_, page, label) => {
+    return `[${label}](<${encodeURIComponent(page)}>)`;
+  });
+  // [[문서]] 형태
+  text = text.replace(/\[\[([^\]]+)\]\]/g, (_, page) => {
+    return `[${page}](<${encodeURIComponent(page)}>)`;
+  });
+  return text;
+}
+
 // ========== 저장/불러오기 ==========
 function loadState() {
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -47,7 +60,7 @@ function loadState() {
           "",
           "## 시작하기",
           "",
-          "문서를 만들어 보세요: [첫 번째 메모](첫 번째 메모), [아이디어 노트](아이디어 노트)",
+          "문서를 만들어 보세요: [[첫 번째 메모]], [[아이디어 노트]]",
           "",
           "상단 입력창에 문서 이름을 입력하고 Enter를 누르면 해당 문서로 이동하거나 새로 생성됩니다. `All`을 입력하면 전체 문서 목록을 볼 수 있어요.",
           "",
@@ -192,7 +205,7 @@ function renderPreview() {
   html += `<button class="title-pin-btn ${isPinned ? 'pinned' : ''}" title="${isPinned ? '고정 해제' : '고정'}">📌</button>`;
   html += '</div>';
   html += '</div>';
-  html += marked.parse(text);
+  html += marked.parse(preprocessWikiLinks(text));
   html += '</div>';
   previewEl.innerHTML = html;
   attachInternalLinkHandlers();
@@ -266,7 +279,7 @@ function updatePreview() {
   const text = editorEl.value;
   let html = '<div class="content-wrapper">';
   html += '<h1 class="page-title">' + state.current + '</h1>';
-  html += marked.parse(text);
+  html += marked.parse(preprocessWikiLinks(text));
   html += '</div>';
   previewEl.innerHTML = html;
   attachInternalLinkHandlers();
@@ -337,7 +350,7 @@ function renderHistoryDetail(idx) {
   html += '</div>';
   html += '</div>';
   html += '<p class="history-timestamp">' + timeStr + '</p>';
-  html += marked.parse(h.content);
+  html += marked.parse(preprocessWikiLinks(h.content));
   html += '</div>';
 
   previewEl.innerHTML = html;
