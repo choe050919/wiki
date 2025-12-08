@@ -1,77 +1,87 @@
 # Mini Wiki Dark 📚
 
-[👉 Use directly on the web (Live Demo)](https://choe050919.github.io/wiki/)
+[👉 웹에서 바로 사용해보기 (라이브 데모)](https://choe050919.github.io/wiki/)
 
-**Mini Wiki Dark** is an ultra-lightweight personal wiki that operates without a server, using the browser's Local Storage. It supports Markdown syntax, wiki-style inter-document linking, version control, dark mode, and more.
+**Mini Wiki Dark**는 브라우저의 로컬 스토리지를 활용하여 서버 없이 동작하는 초경량 개인 위키입니다. 마크다운 문법, 위키 스타일 문서 간 연결, 버전 관리, 다크 모드 등을 지원합니다.
 
-> **Note**: Documents you create by accessing the link above are safely stored in your browser and are not transmitted to any server.
+> **참고**: 위 링크를 통해 접속하여 생성하는 문서는 사용자 브라우저에 안전하게 저장되며, 어떠한 서버로도 전송되지 않습니다.
 
-## ✨ Key Features
+## ✨ 주요 기능
 
-*   **No Server Required**: Can be used immediately by simply running `index.html` without any separate backend installation.
-*   **Data Privacy**: All data is stored only within the browser (Local Storage).
-*   **Markdown Editor**: Supports real-time Markdown rendering using `marked.js`.
-*   **File Drag and Drop**: Supports dragging image (.png, .jpg, .gif) and text (.txt, .md) files directly into the editor. Images are embedded as Base64 data URLs, and text files are inserted as their content.
-*   **Wiki Links**: Free movement and creation of documents using the `[DocumentName](DocumentName)` format.
-*   **Bi-directional Links**: Automatic generation of a document's **Table of Contents (TOC)** and **Backlinks** that mention this document.
-*   **Rename Document**: Allows changing a document's title via the Command Bar (`:rename`), with all backlinks automatically updated.
-*   **History Management**: Saves document revision history and allows restoration to a specific version.
-*   **Sidebar Features**:
-    *   Left: Full document list (alphabetical/recent order), Pinned document management (Drag & Drop sorting and pin/unpin functionality).
-    *   Right: Current document TOC, Backlinks.
-*   **Data Backup**: Supports exporting/importing data in JSON format.
-*   **Theme Support**: Dark mode and light mode switching (Light mode is now the default theme for new users).
+*   **서버 불필요**: 별도의 백엔드 설치 없이 `index.html` 파일을 실행하는 것만으로 바로 사용할 수 있습니다.
+*   **데이터 프라이버시**: 모든 데이터는 브라우저 내부(로컬 스토리지)에만 저장됩니다.
+*   **마크다운 편집기**: `marked.js`를 사용하여 실시간 마크다운 렌더링을 지원합니다.
+*   **파일 드래그 앤 드롭**: 이미지(.png, .jpg, .gif) 및 텍스트(.txt, .md) 파일을 에디터로 직접 드래그하여 업로드할 수 있습니다. 이미지는 Base64 데이터 URL로 삽입되고, 텍스트 파일은 내용이 문서에 삽입됩니다.
+*   **위키 링크**: `[문서이름](문서이름)` 형식으로 문서 간 자유로운 이동 및 생성이 가능합니다.
+*   **양방향 링크**: 특정 문서를 언급하는 **목차(TOC)** 및 해당 문서를 참조하는 **백링크**가 자동으로 생성됩니다.
+*   **문서 이름 변경**: Command Bar (`:rename`)를 통해 문서 제목을 변경할 수 있으며, 모든 백링크가 자동으로 업데이트됩니다.
+*   **히스토리 관리**: 문서의 수정 이력을 저장하고 특정 버전으로 복원할 수 있습니다.
+*   **사이드바 기능**:
+    *   왼쪽: 전체 문서 목록 (알파벳/최근 순), 고정된 문서 관리 (드래그 앤 드롭 정렬 및 고정/고정 해제 기능).
+    *   오른쪽: 현재 문서 목차, 백링크.
+*   **전역 검색**: `Ctrl + G` 또는 명령 바 (`:search`)를 사용하여 모든 문서에서 원하는 내용을 검색할 수 있습니다.
+*   **코드 블록 구문 강조**: `highlight.js`를 사용하여 마크다운 코드 블록에 구문 강조를 제공합니다.
+*   **태그 시스템 (초기 구현)**: `#태그` 문법을 사용하여 문서를 분류하고 관리하는 기능이 초기적으로 구현되었습니다.
+*   **데이터 백업**: JSON 형식으로 데이터를 내보내기/가져오기를 지원합니다.
+*   **테마 지원**: 다크 모드와 라이트 모드 전환 지원 (신규 사용자 기본 테마가 **다크 모드**로 변경되었습니다).
 
-## 🚀 Getting Started
+## 🚀 시작하기
 
-### Method 1: Use Directly on the Web (Recommended)
-You can use it immediately without installation via the link below.
+### 방법 1: 웹에서 바로 사용 (권장)
+아래 링크를 통해 설치 없이 바로 사용할 수 있습니다.
 *   **URL**: https://choe050919.github.io/wiki/
 
-### Method 2: Run Locally
-If you want to use it as a local file without an internet connection, follow these steps.
+### 방법 2: 로컬에서 실행
+인터넷 연결 없이 로컬 파일로 사용하고 싶다면 다음 단계를 따르세요.
 
-1.  Clone this repository or [download as ZIP](https://github.com/choe050919/wiki/archive/refs/heads/main.zip).
-2.  Open the `index.html` file in the unzipped folder with a web browser (Chrome, Edge, Firefox, etc.).
-3.  Start using it right away!
+1.  이 저장소를 클론하거나 [ZIP 파일로 다운로드](https://github.com/choe050919/wiki/archive/refs/heads/main.zip)합니다.
+2.  압축 해제된 폴더에서 `index.html` 파일을 웹 브라우저 (Chrome, Edge, Firefox 등)로 엽니다.
+3.  바로 사용을 시작하세요!
 
-## 📖 How to Use
+## 📖 사용 방법
 
-### 1. Navigate and Create Documents
-*   Enter a document title in the top **Input Bar (Command Bar)** and press `Enter`.
-*   If the document exists, you will navigate to it; otherwise, a **new document** will be created.
-*   Enter `All` to see a list of all documents.
+### 1. 문서 탐색 및 생성
+*   상단 **입력 바 (명령 바)**에 문서 제목을 입력하고 `Enter` 키를 누릅니다.
+*   문서가 존재하면 해당 문서로 이동하고, 그렇지 않으면 **새 문서**가 생성됩니다.
+*   `All`을 입력하여 전체 문서 목록을 볼 수 있습니다.
 
-### 2. Editing Syntax
-Follows general Markdown syntax.
-*   **Internal Link**: `[Link Document Name](Link Document Name)` (e.g., `[Home](Home)`)
-*   **External Link**: `[Google](https://google.com)`
+### 2. 편집 문법
+일반적인 마크다운 문법을 따릅니다.
+*   **내부 링크**: `[링크 문서 이름](링크 문서 이름)` (예: `[홈](홈)`)
+*   **외부 링크**: `[구글](https://google.com)`
+*   **태그**: `#태그이름`
 
-### 3. Commands (Input Bar)
-*   `Document Name`: Navigate to/create the document
-*   `All`: View all documents list
-*   `:history`: View current document's history
-*   `:rename`: Renames the current document.
+### 3. 명령 (입력 바)
+*   `문서 이름`: 해당 문서로 이동/생성
+*   `All`: 모든 문서 목록 보기
+*   `:history`: 현재 문서의 히스토리 보기
+*   `:rename`: 현재 문서의 이름을 변경합니다.
+*   `:search [검색어]`: 모든 문서에서 검색어를 포함하는 문서를 찾습니다.
 
-### 4. File Drag and Drop
-*   To use, simply drag a supported file type (images: `.png`, `.jpg`, `.gif` / text: `.txt`, `.md`) into the editor area. Images will be embedded as Base64 data URLs, and text files will have their content inserted into the document.
+### 4. 파일 드래그 앤 드롭
+*   사용하려면 지원되는 파일 형식(이미지: `.png`, `.jpg`, `.gif` / 텍스트: `.txt`, `.md`)을 편집기 영역으로 드래그하기만 하면 됩니다. 이미지는 Base64 데이터 URL로 삽입되고, 텍스트 파일은 내용이 문서에 삽입됩니다.
 
-### 5. Keyboard Shortcuts
-| Shortcut     | Action              |
+### 5. 키보드 단축키
+| 단축키       | 동작                |
 | :----------- | :------------------ |
-| **Ctrl + E** | Toggle edit mode    |
-| **Ctrl + S** | Save (in edit mode) |
-| **Ctrl + H** | View history        |
-| **Esc**      | Cancel / Return to view mode |
+| **Ctrl + E** | 편집 모드 토글      |
+| **Ctrl + S** | 저장 (편집 모드에서) |
+| **Ctrl + H** | 히스토리 보기       |
+| **Ctrl + G** | 전역 검색 바 열기   |
+| **Ctrl + K** | 명령 바 토글        |
+| **Ctrl + J** | 명령 바 토글        |
+| **Esc**      | 취소 / 보기 모드로 돌아가기 |
 
-## 💾 Backup and Recovery
-Since data is stored in the browser, clearing your browser's cache may delete your data.
-Please regularly back up your data as a `.json` file by clicking the **Export** button in the top menu.
+## 💾 백업 및 복구
+데이터는 브라우저에 저장되므로, 브라우저 캐시를 지우면 데이터가 삭제될 수 있습니다.
+상단 메뉴의 **내보내기(Export)** 버튼을 클릭하여 `.json` 파일로 데이터를 정기적으로 백업해주세요.
 
-## 🛠 Tech Stack
-*   **HTML5 / CSS3** (Flexbox layout, CSS Variables)
-*   **Vanilla JavaScript** (ES6+)
-*   **Library**: [marked.js](https://github.com/markedjs/marked) (Markdown Parsing)
+## 🛠 기술 스택
+*   **HTML5 / CSS3** (Flexbox 레이아웃, CSS 변수)
+*   **바닐라 JavaScript** (ES6+)
+*   **라이브러리**:
+    *   [marked.js](https://github.com/markedjs/marked) (마크다운 파싱)
+    *   [highlight.js](https://highlightjs.org/) (코드 블록 구문 강조)
 
-## 📄 License
+## 📄 라이선스
 MIT License
