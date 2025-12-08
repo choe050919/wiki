@@ -3,6 +3,7 @@ const STORAGE_KEY = "miniWikiDocs";
 const HISTORY_KEY = "miniWikiHistory";
 const VISITED_KEY = "miniWikiVisited";
 const PINNED_KEY = "miniWikiPinned";
+const LINKS_KEY = "miniWikiLinks";
 
 // ========== 앱 상태 (데이터) ==========
 let state = {
@@ -15,6 +16,7 @@ let state = {
 let history = [];      // { page, time, content }
 let pinned = [];       // 고정된 문서 목록
 let visitedTime = {};  // { pageName: timestamp }
+let linkIndex = {};    // { pageName: [linkedPage1, linkedPage2, ...] }
 
 // ========== UI 상태 ==========
 let currentLeftTab = "all";    // "all" | "pinned"
@@ -45,6 +47,82 @@ function preprocessWikiLinks(text) {
   });
   return text;
 }
+
+// ========== 링크 인덱스 ==========
+function parseLinks(text) {
+  const links = new Set();
+  
+  // 위키링크: [[문서]] 또는 [[문서|표시텍스트]]
+  const wikiLinkRegex = /\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g;
+  let match;
+  while ((match = wikiLinkRegex.exec(text)) !== null) {
+    links.add(match[1]);
+  }
+  
+  // 마크다운 링크: [텍스트](링크) - 외부 링크 제외
+  const mdLinkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  while ((match = mdLinkRegex.exec(text)) !== null) {
+    const href = match[2].trim();
+    // 외부 링크, mailto, 앵커 제외
+    if (!href.startsWith('http://') && 
+        !href.startsWith('https://') && 
+        !href.startsWith('mailto:') && 
+        !href.startsWith('#')) {
+      // <문서명> 형태에서 꺾쇠 제거
+      let pageName = href.replace(/^<|>$/g, '');
+      try {
+        pageName = decodeURIComponent(pageName);
+      } catch (e) {}
+      links.add(pageName);
+    }
+  }
+  
+  return Array.from(links);
+}
+
+function loadLinkIndex() {
+  const raw = localStorage.getItem(LINKS_KEY);
+  if (raw) {
+    try {
+      linkIndex = JSON.parse(raw);
+    } catch (e) {
+      linkIndex = {};
+      rebuildLinkIndex();
+    }
+  } else {
+    // 인덱스 없으면 전체 문서에서 빌드
+    rebuildLinkIndex();
+  }
+}
+
+function saveLinkIndex() {
+  localStorage.setItem(LINKS_KEY, JSON.stringify(linkIndex));
+}
+
+function updateLinkIndex(pageName) {
+  const content = state.pages[pageName] || "";
+  linkIndex[pageName] = parseLinks(content);
+  saveLinkIndex();
+}
+
+function getBacklinks(pageName) {
+  const backlinks = [];
+  for (const [page, links] of Object.entries(linkIndex)) {
+    if (page !== pageName && links.includes(pageName)) {
+      backlinks.push(page);
+    }
+  }
+  return backlinks.sort((a, b) => a.localeCompare(b, "ko"));
+}
+
+function rebuildLinkIndex() {
+  linkIndex = {};
+  for (const pageName of Object.keys(state.pages)) {
+    linkIndex[pageName] = parseLinks(state.pages[pageName]);
+  }
+  saveLinkIndex();
+}
+
 
 // ========== 저장/불러오기 ==========
 function loadState() {
@@ -724,26 +802,14 @@ function buildBacklinksContent() {
   }
 
   const currentPage = state.current;
-  const backlinks = [];
-
-  // 모든 페이지에서 현재 페이지를 링크하는 것 찾기
-  for (const [pageName, content] of Object.entries(state.pages)) {
-    if (pageName === currentPage) continue;
-    
-    // 마크다운 링크 패턴: [텍스트](링크)
-    // 현재 페이지를 가리키는 링크 찾기
-    const linkPattern = new RegExp(`\\[([^\\]]+)\\]\\(${escapeRegExp(currentPage)}\\)`, 'g');
-    if (linkPattern.test(content)) {
-      backlinks.push(pageName);
-    }
-  }
+  const backlinks = getBacklinks(currentPage);
 
   if (backlinks.length === 0) {
     return '<p class="sidebar-empty">이 문서를 링크한 문서가 없습니다</p>';
   }
 
   let html = '<ul class="backlink-list">';
-  backlinks.sort((a, b) => a.localeCompare(b, "ko")).forEach(name => {
+  backlinks.forEach(name => {
     html += `<li class="backlink-item">`;
     html += `<a href="#" class="backlink-link" data-page="${encodeURIComponent(name)}">${name}</a>`;
     html += `</li>`;
@@ -801,6 +867,9 @@ function attachInternalLinkHandlers() {
       e.preventDefault();
       let name = trimmed || "Home";
 
+      // <문서명> 형태에서 꺾쇠 제거
+      name = name.replace(/^<|>$/g, '');
+
       try {
         name = decodeURIComponent(name);
       } catch (err) {}
@@ -808,6 +877,7 @@ function attachInternalLinkHandlers() {
       if (!state.pages[name]) {
         state.pages[name] = "# " + name + "\n\n새 문서를 작성하세요.";
         saveState();
+        updateLinkIndex(name);
       }
       state.current = name;
       saveState();
@@ -865,6 +935,7 @@ function importData(file) {
       
       saveState();
       saveHistory();
+      rebuildLinkIndex();
       
       // 화면 갱신
       setMode("view");
@@ -884,6 +955,7 @@ btnSave.addEventListener("click", () => {
   addHistory(state.current, newContent);
   state.pages[state.current] = newContent;
   saveState();
+  updateLinkIndex(state.current);
   setMode("view");
 });
 
@@ -935,6 +1007,7 @@ commandEl.addEventListener("keydown", (e) => {
     } else {
       if (!state.pages[cmd]) {
         state.pages[cmd] = "# " + cmd + "\n\n새 문서를 작성하세요.";
+        updateLinkIndex(cmd);
       }
       state.current = cmd;
       saveState();
@@ -965,6 +1038,7 @@ document.addEventListener("keydown", (e) => {
       addHistory(state.current, newContent);
       state.pages[state.current] = newContent;
       saveState();
+      updateLinkIndex(state.current);
       setMode("view");
     }
   }
@@ -999,6 +1073,7 @@ loadState();
 loadHistory();
 loadVisited();
 loadPinned();
+loadLinkIndex();
 setMode("view");
 
 // 저장된 테마 적용
