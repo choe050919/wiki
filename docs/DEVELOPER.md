@@ -8,14 +8,17 @@
 .
 ├── index.html      # 앱의 진입점, 레이아웃 구조 (Topbar, Main, Sidebars)
 ├── style.css       # 전체 스타일링, CSS 변수(테마), 반응형 처리
-├── script.js       # 핵심 로직 (상태 관리, 라우팅, 스토리지, 이벤트 처리)
-└── README.md       # 사용자 매뉴얼
+├── store.js        # 중앙 상태 관리 (State)
+├── router.js       # 네비게이션 및 모드 변경
+├── editor.js       # 마크다운 에디터 로직
+├── sidebar.js      # 사이드바 관리
+└── utils.js        # 헬퍼 함수
 ```
 
 ## 🏗 아키텍처 및 상태 관리
 
 이 앱은 바닐라 자바스크립트로 작성된 **SPA(Single Page Application)** 형태입니다.  
-`script.js` 내의 `state` 객체가 앱의 모든 상태를 관리하며, 변경 사항은 즉시 `localStorage`에 동기화됩니다.
+모든 애플리케이션 상태는 중앙 상태 관리 모듈인 `store.js`를 통해 관리됩니다. 기존 `script.js`에 있던 전역 `state` 객체는 스토어의 메서드를 호출하는 방식으로 대체되었습니다.
 
 ### 1\. 주요 상수 (Storage Keys)
 
@@ -25,24 +28,9 @@
   * `miniWikiPinned`: 사이드바에 고정된 문서 목록 저장.
   * `miniWikiLinks`: 문서 간 링크 인덱스 저장 (백링크 계산 최적화용).
 
-### 2\. State 객체 구조
+### 2\. 모드 시스템
 
-```javascript
-let state = {
-  current: "Home",       // 현재 보고 있는 문서의 제목 (String)
-  pages: {               // 모든 문서 데이터 (Object)
-    "Home": "# Home\n 내용...",
-    "AnotherPage": "..."
-  },
-  mode: "view",          // 현재 UI 모드 (view | edit | list | history | historyDetail)
-  historyPage: null,     // 히스토리 모드에서 보고 있는 대상 문서명
-  historyIdx: null       // 히스토리 상세 보기 시 선택된 인덱스
-};
-```
-
-### 3\. 모드 시스템 (`setMode`)
-
-UI는 `state.mode`에 따라 렌더링이 달라집니다.
+UI는 스토어에서 관리하는 현재 모드(`mode`)에 따라 렌더링이 달라집니다.
 
   * **view**: 마크다운 렌더링 화면 (`previewEl` 표시, `editorEl` 숨김).
   * **edit**: 텍스트 에디터 화면 (`editorEl` 표시).
@@ -55,7 +43,7 @@ UI는 `state.mode`에 따라 렌더링이 달라집니다.
 ### 사이드바 (Sidebars)
 
   * **좌측 (Sidebar Left)**:
-      * **전체 탭**: `state.pages` 키를 기반으로 가나다순(`alpha`) 또는 최근 방문순(`recent`) 정렬.
+      * **전체 탭**: 스토어에 저장된 페이지(`pages`) 목록을 기반으로 가나다순(`alpha`) 또는 최근 방문순(`recent`) 정렬.
       * **고정 탭**: `pinned` 배열을 기반으로 렌더링하며, HTML5 Drag & Drop API를 사용하여 순서 변경 가능.
   * **우측 (Sidebar Right)**:
       * **목차 (TOC)**: 렌더링된 HTML의 `h1`\~`h6` 태그를 파싱하여 동적으로 생성. 나무위키 스타일의 넘버링 로직 포함.
@@ -66,8 +54,8 @@ UI는 `state.mode`에 따라 렌더링이 달라집니다.
 
 ### 히스토리 (History)
 
-  * 문서 저장(`Ctrl+S` 또는 버튼 클릭) 시 `addHistory()` 함수가 호출됩니다.
-  * `history` 배열에 `{ page, time, content }` 객체를 추가합니다.
+  * 문서 저장 시 스토어를 통해 히스토리가 추가됩니다.
+  * 히스토리 배열에 `{ page, time, content }` 객체를 추가합니다.
   * 최대 **100개**의 최신 기록만 유지하도록 슬라이싱 처리되어 있습니다.
 
 ### 마크다운 렌더링
