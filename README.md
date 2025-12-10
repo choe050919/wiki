@@ -1,6 +1,6 @@
 # Mini Wiki Dark 📚
 
-[👉 웹에서 바로 사용해보기 (라이브 데모)](https://choe050919.github.io/wiki/)
+[👉 웹에서 바로 사용해보기 (라이브 데모)](https://choe050919.github.io/MiniWiki/)
 
 **Mini Wiki Dark**는 브라우저의 로컬 스토리지를 활용하여 서버 없이 동작하는 초경량 개인 위키입니다. 마크다운 문법, 위키 스타일 문서 간 연결, 버전 관리, 다크 모드 등을 지원합니다.
 
@@ -24,12 +24,12 @@
 
 ### 방법 1: 웹에서 바로 사용 (권장)
 아래 링크를 통해 설치 없이 바로 사용할 수 있습니다.
-*   **URL**: https://choe050919.github.io/wiki/
+*   **URL**: https://choe050919.github.io/MiniWiki/
 
 ### 방법 2: 로컬에서 실행
 인터넷 연결 없이 로컬 파일로 사용하고 싶다면 다음 단계를 따르세요.
 
-1.  이 저장소를 클론하거나 [ZIP 파일로 다운로드](https://github.com/choe050919/wiki/archive/refs/heads/main.zip)합니다.
+1.  이 저장소를 클론하거나 [ZIP 파일로 다운로드](https://github.com/choe050919/MiniWiki/archive/refs/heads/main.zip)합니다.
 2.  압축 해제된 폴더에서 'index.html' 파일을 웹 브라우저 (Chrome, Edge, Firefox 등)로 엽니다.
 3.  바로 사용을 시작하세요!
 
