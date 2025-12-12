@@ -263,6 +263,45 @@ export function togglePin(pageName) {
   savePinned();
 }
 
+// 문서 삭제 (히스토리는 유지)
+export function deletePage(pageName) {
+  // 문서 삭제
+  delete state.pages[pageName];
+  
+  // 고정 목록에서 제거
+  const pinnedIdx = pinned.indexOf(pageName);
+  if (pinnedIdx !== -1) {
+    pinned.splice(pinnedIdx, 1);
+    savePinned();
+  }
+  
+  // 링크 인덱스에서 제거
+  delete linkIndex[pageName];
+  saveLinkIndex();
+  
+  // 방문 기록에서 제거
+  delete visitedTime[pageName];
+  saveVisited();
+  
+  // 상태 저장
+  saveState();
+  
+  // 다음 문서 결정: Home 우선, 없으면 첫 번째 문서
+  const pages = Object.keys(state.pages);
+  if (pages.includes("Home")) {
+    state.current = "Home";
+  } else if (pages.length > 0) {
+    state.current = pages[0];
+  } else {
+    // 문서가 하나도 없으면 Home 새로 생성
+    state.pages["Home"] = "# Home\n\n새 문서를 작성하세요.";
+    state.current = "Home";
+  }
+  saveState();
+  
+  return state.current; // 이동할 페이지 반환
+}
+
 // 정규식 특수문자 이스케이프
 export function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

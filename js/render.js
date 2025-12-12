@@ -18,7 +18,8 @@ import {
   togglePin,
   updateLinkIndex,
   getBacklinks,
-  savePinned
+  savePinned,
+  deletePage as deletePageFromState
 } from './state.js';
 
 // ========== DOM 요소 ==========
@@ -93,6 +94,7 @@ export function renderPreview() {
   html += '<div class="title-actions">';
   html += `<button class="title-btn" id="title-btn-edit" title="편집">편집</button>`;
   html += `<button class="title-btn" id="title-btn-history" title="역사">역사</button>`;
+  html += `<button class="title-btn title-btn-delete" id="title-btn-delete" title="삭제">삭제</button>`;
   html += `<button class="title-pin-btn ${isPinned ? 'pinned' : ''}" title="${isPinned ? '고정 해제' : '고정'}">📌</button>`;
   html += '</div>';
   html += '</div>';
@@ -108,6 +110,7 @@ function attachTitleButtonHandlers() {
   const pinBtn = previewEl.querySelector(".title-pin-btn");
   const editBtn = previewEl.querySelector("#title-btn-edit");
   const historyBtn = previewEl.querySelector("#title-btn-history");
+  const deleteBtn = previewEl.querySelector("#title-btn-delete");
   
   if (pinBtn) {
     pinBtn.addEventListener("click", () => {
@@ -128,6 +131,15 @@ function attachTitleButtonHandlers() {
   if (historyBtn) {
     historyBtn.addEventListener("click", () => {
       setMode("history", { historyPage: state.current });
+    });
+  }
+  
+  if (deleteBtn) {
+    deleteBtn.addEventListener("click", () => {
+      if (confirm(`"${state.current}" 문서를 삭제하시겠습니까?`)) {
+        deletePageFromState(state.current);
+        setMode("view");
+      }
     });
   }
 }

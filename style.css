@@ -626,3 +626,24 @@ body {
   background: var(--btn-bg);
   border-radius: 3px;
 }
+
+/* 삭제 버튼 */
+.title-btn-delete {
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+.title-btn-delete:hover {
+  background: #ff6b6b;
+  color: #fff;
+}
+
+.light .title-btn-delete {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.light .title-btn-delete:hover {
+  background: #dc3545;
+  color: #fff;
+}
