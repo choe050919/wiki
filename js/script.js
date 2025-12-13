@@ -14,7 +14,8 @@ import {
 
 import {
   setMode,
-  updatePreview
+  updatePreview,
+  buildSidebarLeft
 } from './render.js';
 
 // ========== DOM 요소 ==========
@@ -109,6 +110,73 @@ function importData(file) {
   };
   
   reader.readAsText(file);
+}
+
+
+// ========== Instant Drag-Drop (.md/.txt) ==========
+function _isAllowedDropFile(file) {
+  const name = (file?.name || "").toLowerCase();
+  return name.endsWith(".md") || name.endsWith(".txt");
+}
+
+function _baseDocName(fileName) {
+  return fileName.replace(/\.(md|txt)$/i, "").trim() || "Untitled";
+}
+
+function _makeUniqueDocName(base) {
+  if (!state.pages[base]) return base;
+  let i = 2;
+  while (state.pages[`${base} (${i})`]) i++;
+  return `${base} (${i})`;
+}
+
+async function _importDroppedFiles(fileList) {
+  const files = Array.from(fileList || []).filter(_isAllowedDropFile);
+  if (files.length === 0) return;
+
+  for (const file of files) {
+    const base = _baseDocName(file.name);
+    const docName = _makeUniqueDocName(base);
+
+    let content = "";
+    try {
+      content = await file.text();
+    } catch (err) {
+      console.warn("파일 읽기 실패:", file.name, err);
+      continue;
+    }
+
+    state.pages[docName] = content;
+    updateLinkIndex(docName);
+  }
+
+  // 이동은 하지 않음 (요구사항)
+  saveState();
+
+  // 즉시 사이드바 반영
+  buildSidebarLeft();
+}
+
+function setupInstantDragDrop() {
+  // 브라우저 기본 파일 열기/탐색 동작 방지
+  document.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = "copy";
+    }
+  });
+
+  document.addEventListener("drop", async (e) => {
+    e.preventDefault();
+    const files = e.dataTransfer?.files;
+    if (!files || files.length === 0) return;
+
+    try {
+      await _importDroppedFiles(files);
+    } catch (err) {
+      alert("드롭 가져오기 중 오류가 발생했습니다: " + err.message);
+    }
+  });
 }
 
 // ========== 이벤트 리스너 ==========
@@ -237,6 +305,7 @@ loadHistory();
 loadVisited();
 loadPinned();
 loadLinkIndex();
+setupInstantDragDrop();
 setMode("view");
 
 // 저장된 테마 적용
